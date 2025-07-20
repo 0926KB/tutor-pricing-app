@@ -225,6 +225,9 @@ age_high = st.checkbox("고등학생")
 age_middle = st.checkbox("중학생")
 age_elementary = st.checkbox("초등학생")
 
+# 9. 실제 받고 있는 시급 입력 (선택)
+actual_hourly = st.number_input("현재 받고 있는 시급을 입력해주세요 (선택)", min_value=0, step=1000)
+
 
 if st.button("💡 예측 실행"):
     input_data = pd.DataFrame([{
@@ -244,3 +247,27 @@ if st.button("💡 예측 실행"):
     pred_log = pipeline.predict(input_data)[0]
     pred_won = int(np.expm1(pred_log))
     st.success(f"💰 예측된 시급: \u20a9{pred_won:,}")
+
+    # ✅ 유저 입력 저장 (CSV 방식)
+    user_data_row = [
+        exp_kor,
+        match_kor,
+        jobtype_kor,
+        mode_kor,
+        material_kor,
+        students,
+        normalized_name,
+        tier,
+        int(age_final),
+        int(age_adult),
+        int(age_high),
+        int(age_middle),
+        int(age_elementary),
+        actual_hourly,
+        pred_won  # 예측 결과도 같이 저장하면 좋음
+    ]
+
+    import csv
+    with open("form_submissions.csv", "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(user_data_row)
