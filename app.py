@@ -11,6 +11,9 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 # =============================
 # STEP 1: 데이터 정제 및 저장
 # =============================
@@ -266,6 +269,17 @@ if st.button("💡 예측 실행"):
         actual_hourly,
         pred_won  # 예측 결과도 같이 저장하면 좋음
     ]
+    
+    # ✅ Google Sheets에 저장
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        st.secrets["gcp_service_account"], 
+        scope
+    )
+    client = gspread.authorize(creds)
+
+    sheet = client.open("Tutorpays Submissions").sheet1  # 구글 시트 이름
+    sheet.append_row(user_data_row)
 
     import csv
     with open("form_submissions.csv", "a", newline="", encoding="utf-8") as f:
